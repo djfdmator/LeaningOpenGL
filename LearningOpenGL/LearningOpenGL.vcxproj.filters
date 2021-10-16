@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="chapter2.cpp">
+    <ClCompile Include="chapter2_Icosahedron.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
