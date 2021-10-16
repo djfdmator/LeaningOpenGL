@@ -1,12 +1,29 @@
+#include<cmath>
 #include"glut.h"
 
 #define X .525731112119133606
 #define Z .850650808352039932
 
-void init(void)
+
+void normalize(float v[3])
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glShadeModel(GL_FLAT);
+	GLfloat d = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+	if (d == 0.0)
+	{
+		return;
+	}
+
+	v[0] /= d;
+	v[1] /= d;
+	v[2] /= d;
+}
+
+void normcrossprod(float v1[3], float v2[3], float out[3])
+{
+	out[0] = v1[1] * v2[2] - v1[2] * v2[1];
+	out[1] = v1[2] * v2[0] - v1[0] * v2[2];
+	out[2] = v1[0] * v2[1] - v1[1] * v2[0];
+	normalize(out);
 }
 
 static GLfloat vdata[12][3] = {
@@ -22,6 +39,12 @@ static GLuint tindices[20][3] = {
 	{10, 1, 6}, {11, 0, 9}, {2, 11, 9}, {5, 2, 9}, {11, 2, 7},
 };
 
+void init(void)
+{
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glShadeModel(GL_FLAT);
+}
+
 void display(void)
 {
 	int i;
@@ -31,14 +54,33 @@ void display(void)
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
+	glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_INDEX_ARRAY);
+	//glEnableClientState(GL_NORMAL_ARRAY);
+	
+	glVertexPointer(3, GL_FLOAT, 0, vdata);
+	
 	glBegin(GL_TRIANGLES);
 	for (i = 0; i < 20; i++)
 	{
-		glVertex3fv(&vdata[tindices[i][0]][0]);
-		glVertex3fv(&vdata[tindices[i][1]][0]);
-		glVertex3fv(&vdata[tindices[i][2]][0]);
+		//GLfloat d1[3], d2[3], norm[3];
+		//for (int j = 0; j < 3; j++)
+		//{
+		//	d1[j] = vdata[tindices[i][0]][j] - vdata[tindices[i][1]][j];
+		//	d2[j] = vdata[tindices[i][1]][j] - vdata[tindices[i][2]][j];
+		//}
+		//normcrossprod(d1, d2, norm);
+		//glNormal3fv(norm);
+
+		//glArrayElement(tindices[i][0]);
+		//glArrayElement(tindices[i][1]);
+		//glArrayElement(tindices[i][2]);
+
+		glDrawElements(GL_TRIANGLES, 3, GL_FLOAT, tindices[i]);
 	}
 	glEnd();
+	
+	glDisableClientState(GL_VERTEX_ARRAY);
 
 	glFlush();
 }
@@ -57,7 +99,7 @@ int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-	glutInitWindowSize(800, 350);
+	glutInitWindowSize(400, 400);
 	glutInitWindowPosition(200, 200);
 	glutCreateWindow(argv[0]);
 	init();
