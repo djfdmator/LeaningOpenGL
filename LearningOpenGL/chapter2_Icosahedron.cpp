@@ -41,15 +41,32 @@ static GLuint tindices[20][3] = {
 
 void init(void)
 {
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glShadeModel(GL_FLAT);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = {50.0 };
+	GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+	GLfloat light_color[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat model_ambient[] = { 0.1, 0.1, 0.1, 1.0 };
+
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glShadeModel(GL_SMOOTH);
+
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void display(void)
 {
 	int i;
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glColor3f(0.0f, 1.0f, 1.0f);
 	glLoadIdentity();
 	gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
@@ -60,25 +77,25 @@ void display(void)
 	
 	glVertexPointer(3, GL_FLOAT, 0, vdata);
 	
-	glBegin(GL_TRIANGLES);
+	//glBegin(GL_TRIANGLES);
 	for (i = 0; i < 20; i++)
 	{
-		//GLfloat d1[3], d2[3], norm[3];
-		//for (int j = 0; j < 3; j++)
-		//{
-		//	d1[j] = vdata[tindices[i][0]][j] - vdata[tindices[i][1]][j];
-		//	d2[j] = vdata[tindices[i][1]][j] - vdata[tindices[i][2]][j];
-		//}
-		//normcrossprod(d1, d2, norm);
-		//glNormal3fv(norm);
+		GLfloat d1[3], d2[3], norm[3];
+		for (int j = 0; j < 3; j++)
+		{
+			d1[j] = vdata[tindices[i][0]][j] - vdata[tindices[i][1]][j];
+			d2[j] = vdata[tindices[i][1]][j] - vdata[tindices[i][2]][j];
+		}
+		normcrossprod(d1, d2, norm);
+		glNormal3fv(norm);
 
-		//glArrayElement(tindices[i][0]);
 		//glArrayElement(tindices[i][1]);
 		//glArrayElement(tindices[i][2]);
+		//glArrayElement(tindices[i][0]);
 
-		glDrawElements(GL_TRIANGLES, 3, GL_FLOAT, tindices[i]);
+		glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, tindices[i]);
 	}
-	glEnd();
+	//glEnd();
 	
 	glDisableClientState(GL_VERTEX_ARRAY);
 
